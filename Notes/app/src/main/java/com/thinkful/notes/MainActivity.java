@@ -8,9 +8,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.thinkful.notes.adapter.NoteListItemAdapter;
+import com.thinkful.notes.model.NoteListItem;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -18,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private NoteListItemAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private Button mButton;
+    private EditText mEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +39,20 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new NoteListItemAdapter(this, mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
+
+        mEditText = (EditText) findViewById(R.id.edit_text);
+        mButton = (Button) findViewById(R.id.button);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the text in the EditText
+                // Create a new NoteListItem with the text
+                // Add the item to the adapter
+                // Set the EditText to an empty string
+                mAdapter.addItem(new NoteListItem(mEditText.getText().toString()));
+                mEditText.setText("");
+            }
+        });
     }
 
     @Override
