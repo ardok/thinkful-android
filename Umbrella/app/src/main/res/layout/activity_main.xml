@@ -17,11 +17,27 @@
         android:orientation="vertical"
         android:layout_below="@+id/toolbar">
 
-        <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-            android:id="@+id/textView"
+        <!--<TextView android:text="@string/hello_world" android:layout_width="wrap_content"-->
+            <!--android:id="@+id/textView"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="@color/primary_dark_material_dark"-->
+            <!--android:textSize="@dimen/abc_text_size_large_material"/>-->
+
+        <Button
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/primary_dark_material_dark"
-            android:textSize="@dimen/abc_text_size_large_material"/>
+            android:text="Set Alarm"
+            android:id="@+id/btnSetAlarm"
+            android:layout_below="@+id/btnSetAlarm" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel Alarm"
+            android:id="@+id/btnCancelAlarm"
+            android:layout_below="@+id/btnSetAlarm"
+            android:layout_alignRight="@+id/btnSetAlarm"
+            android:layout_alignEnd="@+id/btnSetAlarm" />
 
     </LinearLayout>
 

@@ -1,34 +1,20 @@
 package com.thinkful.umbrella;
 
 import android.location.Location;
-import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 
 public class MainActivity extends AppCompatActivity
@@ -38,12 +24,13 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "UmbrellaMainActivity";
 
-    private TextView mTextView;
-
     private GoogleApiClient mGoogleApiClient;
 
     private Location mLastLocation;
     private int mLocationUpdateCount = 0;
+
+    private Button btnSetAlarm;
+    private Button btnCancelAlarm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +41,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Bind views
-        mTextView = (TextView) findViewById(R.id.textView);
+        btnSetAlarm = (Button) findViewById(R.id.btnSetAlarm);
+        btnCancelAlarm = (Button) findViewById(R.id.btnCancelAlarm);
 
         // Set Google API
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -63,6 +50,27 @@ public class MainActivity extends AppCompatActivity
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
+        btnSetAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mLastLocation != null) {
+                    Alarm alarm = new Alarm();
+                    alarm.setAlarm(getApplicationContext(), new AlarmSetParams(7, 30),
+                            new UmbrellaLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                }
+            }
+        });
+        btnCancelAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mLastLocation != null) {
+                    Alarm alarm = new Alarm();
+                    alarm.cancelAlarm(getApplicationContext(),
+                            new UmbrellaLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                }
+            }
+        });
     }
 
     @Override
@@ -80,9 +88,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (mGoogleApiClient.isConnected()) {
-            startLocationUpdates();
-        }
     }
 
     @Override
@@ -120,6 +125,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startLocationUpdates() {
+        if (!mGoogleApiClient.isConnected()) {
+            return;
+        }
         LocationRequest mLocationRequest = new LocationRequest();
 
         mLocationRequest.setInterval(500);
@@ -148,11 +156,14 @@ public class MainActivity extends AppCompatActivity
 
             // Fetch weather data
             // http://openweathermap.org/forecast
-            String url = String.format("http://api.openweathermap.org/data/2.5/forecast/daily?lat=%s&lon=%s&mode=json&units=metric&cnt=1",
-                    mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            String url = String.format(
+                "http://api.openweathermap.org/data/2.5/forecast/daily?lat=%s&lon=%s&mode=json&units=metric&cnt=1",
+                mLastLocation.getLatitude(),
+                mLastLocation.getLongitude()
+            );
 
             Log.i(TAG, String.format(
-                "Location locked (lat, lng): (%s, %s)", mLastLocation.getLatitude(), mLastLocation.getLongitude()
+                "UmbrellaLocation locked (lat, lng): (%s, %s)", mLastLocation.getLatitude(), mLastLocation.getLongitude()
             ));
 
             WebServiceTask webserviceTask = new WebServiceTask();
@@ -163,70 +174,5 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
-    }
-
-    private class WebServiceTask extends AsyncTask<String, String, String> {
-
-        private String url;
-
-        @Override
-        protected String doInBackground(String... params) {
-            String useUmbrellaStr = "Don't know, sorry about that.";
-            HttpURLConnection urlConnection = null;
-            this.url = params[0];
-            Log.i(TAG, "WebServiceTask URL: " + this.url);
-
-            try {
-                URL url = new URL(this.url);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                useUmbrellaStr = useUmbrella(urlConnection.getInputStream());
-            } catch (IOException e) {
-                Log.e(TAG, "WebServiceTask error in connecting", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-            }
-            return useUmbrellaStr;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            mTextView.setText("Should I take an umbrella today? " + s);
-        }
-
-        protected String useUmbrella(InputStream in) {
-            //read and parse InputStream
-            StringBuilder stringBuilder = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            String line;
-            try {
-                while ((line = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
-                }
-                JSONObject forecastJson = new JSONObject(stringBuilder.toString());
-                JSONArray weatherArray = forecastJson.getJSONArray("list");
-                JSONObject todayForecast = weatherArray.getJSONObject(0);
-                Log.i(TAG, String.format("WebServiceTask response received for url: %s. %s", this.url, todayForecast));
-                if (todayForecast.has("rain") || todayForecast.has("snow")) {
-                    return "Yes";
-                }
-                return "No";
-            } catch (IOException e) {
-                Log.e(TAG, "Error", e);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } finally {
-                // Finally block will always get called even if you return earlier in your
-                //   try catch block
-                try {
-                    bufferedReader.close();
-                } catch (final IOException e) {
-                    Log.e(TAG, "Error closing stream", e);
-                }
-            }
-            return "Don't know, sorry about that.";
-        }
     }
 }

@@ -8,7 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.thinkful.notes.R;
-import com.thinkful.notes.model.NoteListItem;
+import com.thinkful.notes.model.note.NoteDAO;
+import com.thinkful.notes.model.note.NoteListItem;
 
 import java.util.ArrayList;
 
@@ -24,7 +25,9 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
     public NoteListItemAdapter(Context context, RecyclerView recyclerView) {
         this.mContext = context;
         this.mRecyclerView = recyclerView;
-        this.mNoteListItems.add(new NoteListItem("This is your first note."));
+
+        NoteDAO noteDAO = new NoteDAO(context);
+        mNoteListItems = (ArrayList<NoteListItem>) noteDAO.list();
     }
 
     @Override

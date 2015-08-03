@@ -14,7 +14,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.thinkful.notes.adapter.NoteListItemAdapter;
-import com.thinkful.notes.model.NoteListItem;
+import com.thinkful.notes.model.note.NoteDAO;
+import com.thinkful.notes.model.note.NoteDBHelper;
+import com.thinkful.notes.model.note.NoteListItem;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Make sure database is created
+        NoteDBHelper.getInstance(this).getReadableDatabase();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
         setSupportActionBar(toolbar);
@@ -49,8 +54,12 @@ public class MainActivity extends AppCompatActivity {
                 // Create a new NoteListItem with the text
                 // Add the item to the adapter
                 // Set the EditText to an empty string
-                mAdapter.addItem(new NoteListItem(mEditText.getText().toString()));
+                NoteListItem note = new NoteListItem(mEditText.getText().toString());
+                mAdapter.addItem(note);
                 mEditText.setText("");
+                mLayoutManager.scrollToPosition(0);
+                NoteDAO dao = new NoteDAO(MainActivity.this);
+                dao.save(note);
             }
         });
     }
