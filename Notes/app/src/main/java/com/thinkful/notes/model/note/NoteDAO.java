@@ -29,7 +29,7 @@ public class NoteDAO {
         values.put(NoteDBContract.Note.COLUMN_NAME_STATUS, note.getStatus());
         values.put(NoteDBContract.Note.COLUMN_NAME_NOTE_DATE, note.getDate().getTimeInMillis() / 1000);
 
-        return db.insert(NoteDBContract.DATABASE_NAME, null, values);
+        return db.insert(NoteDBContract.Note.TABLE_NAME, null, values);
     }
 
     public List<NoteListItem> list() {
