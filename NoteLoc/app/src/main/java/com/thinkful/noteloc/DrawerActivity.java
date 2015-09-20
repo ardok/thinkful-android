@@ -13,15 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
-/**
- * Created by ardokusuma on 9/13/15.
- */
 public class DrawerActivity extends AppCompatActivity {
-    Toolbar mToolbar;
-    DrawerLayout mDrawerLayout;
-    NavigationView mNavigationView;
-    FrameLayout mContentFrame;
-    int mCurrentSelectedPosition;
+    private Toolbar mToolbar;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
+    private FrameLayout mContentFrame;
+    private int mCurrentSelectedPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +36,6 @@ public class DrawerActivity extends AppCompatActivity {
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-
                 menuItem.setChecked(true);
                 switch (menuItem.getItemId()) {
                     case R.id.navigation_item_1:
@@ -99,5 +95,13 @@ public class DrawerActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public DrawerLayout getDrawerLayout() {
+        return mDrawerLayout;
+    }
+
+    public FrameLayout getContentFrame() {
+        return mContentFrame;
     }
 }
