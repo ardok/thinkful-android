@@ -1,12 +1,14 @@
 package com.thinkful.noteloc.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.thinkful.noteloc.CreateActivity;
 import com.thinkful.noteloc.R;
 import com.thinkful.noteloc.model.note.NoteDAO;
 import com.thinkful.noteloc.model.note.NoteListItem;
@@ -43,7 +45,9 @@ public class NoteListItemAdapter extends RecyclerView.Adapter<NoteListItemAdapte
             public void onClick(View v) {
                 // Get the position of v
                 // Call the removeItem method with the position
-                removeItem(viewHolder.getAdapterPosition());
+//                removeItem(viewHolder.getAdapterPosition());
+                Intent intent = new Intent(mContext, CreateActivity.class);
+                mContext.startActivity(intent);
             }
         });
         viewHolder.setText(noteListItem.getText());

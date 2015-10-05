@@ -27,3 +27,6 @@ proguard/
 *.log
 
 **/.idea/
+
+# Sample project that doesn't need to get committed
+NavDrawerTest/

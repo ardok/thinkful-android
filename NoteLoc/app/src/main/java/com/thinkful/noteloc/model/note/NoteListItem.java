@@ -2,9 +2,6 @@ package com.thinkful.noteloc.model.note;
 
 import java.util.Calendar;
 
-/**
- * Created by ardokusuma on 7/5/15.
- */
 public class NoteListItem {
     private Long id;
     private String text;
